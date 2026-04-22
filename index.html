@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soryn Fintech — International Payments Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy:     #1e3a5f;
+  --navy-mid: #2d5282;
+  --steel:    #4a7fa5;
+  --silver:   #8fafc8;
+  --light:    #dde8f0;
+  --paper:    #f4f7fa;
+  --white:    #ffffff;
+  --ink:      #0f1e2e;
+  --muted:    #6b8299;
+  --green:    #1a7a52;
+  --green-bg: #e8f5ef;
+  --amber:    #c45c1a;
+  --border:   rgba(30,58,95,0.12);
+  --shadow-sm: 0 2px 12px rgba(30,58,95,0.08);
+  --shadow-md: 0 8px 40px rgba(30,58,95,0.12);
+}
+
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+.header {
+  background: var(--navy);
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 110px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.logo-area { display: flex; align-items: center; gap: 12px; }
+.logo-img { height: 90px; width: auto; }
+.header-tag {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--silver);
+  border-left: 1px solid rgba(255,255,255,0.2);
+  padding-left: 12px;
+  margin-left: 4px;
+}
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 60%, #1a4a7a 100%);
+  padding: 60px 40px 80px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -120px; right: -120px;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -80px; left: 30%;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.03);
+}
+.hero-inner { max-width: 820px; margin: 0 auto; position: relative; z-index: 1; }
+.hero-eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--silver);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.hero-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 24px; height: 1px;
+  background: var(--steel);
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+  font-weight: 400;
+  color: var(--white);
+  line-height: 1.15;
+  margin-bottom: 20px;
+}
+.hero h1 em {
+  font-style: italic;
+  color: #7ec8e3;
+}
+.hero-sub {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.6);
+  max-width: 560px;
+  line-height: 1.7;
+  font-weight: 300;
+  margin-bottom: 36px;
+}
+
+/* ── TRUST BADGES ── */
+.trust-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.trust-badge {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 30px;
+  padding: 7px 16px;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.8);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  backdrop-filter: blur(4px);
+}
+.trust-badge .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #4eca7e;
+  flex-shrink: 0;
+}
+.trust-badge .verified {
+  width: 20px; height: 20px;
+  flex-shrink: 0;
+}
+.trust-badge.yield-badge {
+  border-color: rgba(78,202,126,0.35);
+  background: rgba(78,202,126,0.1);
+}
+.yield-dot {
+  background: #4eca7e;
+  box-shadow: 0 0 6px rgba(78,202,126,0.6);
+}
+
+/* ── MAIN LAYOUT ── */
+.main { max-width: 820px; margin: -32px auto 0; padding: 0 24px 80px; position: relative; z-index: 2; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 36px 40px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+  animation: fadeUp 0.4s ease both;
+}
+.card:nth-child(2) { animation-delay: 0.1s; }
+.card:nth-child(3) { animation-delay: 0.15s; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.section-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--steel);
+  font-weight: 600;
+  margin-bottom: 24px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-label::before {
+  content: '';
+  display: inline-block;
+  width: 3px; height: 14px;
+  background: var(--navy);
+  border-radius: 2px;
+}
+
+/* ── FORM ELEMENTS ── */
+.field { margin-bottom: 22px; }
+.field:last-child { margin-bottom: 0; }
+
+label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
+}
+
+.input-wrap { position: relative; display: flex; align-items: center; }
+.input-prefix {
+  position: absolute;
+  left: 14px;
+  font-size: 0.9rem;
+  color: var(--muted);
+  pointer-events: none;
+  font-weight: 500;
+}
+
+input[type="number"], select {
+  width: 100%;
+  padding: 13px 14px 13px 32px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  background: var(--paper);
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  appearance: none;
+}
+input[type="number"]:focus, select:focus {
+  border-color: var(--navy);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(30,58,95,0.08);
+}
+select {
+  padding-left: 14px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a7fa5' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+
+.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+/* ── SLIDER ── */
+.slider-wrap { display: flex; align-items: center; gap: 14px; }
+input[type="range"] {
+  flex: 1;
+  appearance: none;
+  height: 5px;
+  background: var(--light);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--navy);
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(30,58,95,0.3);
+  transition: transform 0.15s;
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.slider-val {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--navy);
+  min-width: 52px;
+  text-align: right;
+}
+.field-hint {
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+/* ── RESULTS ── */
+.results-card {
+  background: var(--navy);
+  border-radius: 8px;
+  padding: 40px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  animation: fadeUp 0.5s ease 0.2s both;
+}
+.results-card::before {
+  content: '';
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 350px; height: 350px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.05);
+  pointer-events: none;
+}
+.results-card::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; left: -60px;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.04);
+  pointer-events: none;
+}
+
+.results-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--silver);
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* ── KEY METRICS ROW ── */
+.key-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 32px;
+}
+.key-metric {
+  background: rgba(255,255,255,0.04);
+  padding: 22px 20px;
+  position: relative;
+}
+.key-metric.hero-metric {
+  background: rgba(78,202,126,0.12);
+  border: 1px solid rgba(78,202,126,0.2);
+}
+.km-label {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+.km-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: white;
+  line-height: 1;
+}
+.km-val.green { color: #4eca7e; }
+.km-val.red   { color: #f08070; }
+.km-sub {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.35);
+  margin-top: 5px;
+}
+
+/* ── WORKING CAPITAL HIGHLIGHT ── */
+.wc-highlight {
+  background: rgba(126,200,227,0.08);
+  border: 1px solid rgba(126,200,227,0.2);
+  border-radius: 6px;
+  padding: 20px 24px;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.wc-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+.wc-text { flex: 1; }
+.wc-title {
+  font-size: 0.8rem;
+  color: #7ec8e3;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 5px;
+}
+.wc-body {
+  font-size: 0.92rem;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.5;
+}
+.wc-body strong { color: white; }
+
+/* ── BREAKDOWN TABLE ── */
+.breakdown {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 24px;
+}
+.breakdown-title {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 12px;
+}
+.br-table {
+  display: grid;
+  grid-template-columns: 1fr 100px 100px;
+  width: 100%;
+  row-gap: 0;
+}
+.br-th {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: right;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.br-th:first-child { text-align: left; }
+.br-label {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.5);
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  align-items: center;
+}
+.br-val {
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: right;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.br-val.bank  { color: #f08070; }
+.br-val.soryn { color: #4eca7e; }
+.br-total-label {
+  font-size: 0.9rem;
+  color: white;
+  font-weight: 600;
+  padding: 14px 0 0;
+  display: flex;
+  align-items: center;
+}
+.br-total-val {
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: right;
+  padding: 14px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.br-total-val.bank  { color: #f08070; }
+.br-total-val.soryn { color: #4eca7e; }
+.br-divider {
+  grid-column: 1 / -1;
+  border-top: 1px solid rgba(255,255,255,0.15);
+  margin-top: 4px;
+}
+
+/* ── HOW IT WORKS ── */
+.how-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 36px 40px;
+  margin-bottom: 20px;
+  animation: fadeUp 0.5s ease 0.25s both;
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  position: relative;
+  margin-top: 8px;
+}
+.steps::before {
+  content: '';
+  position: absolute;
+  top: 24px;
+  left: 12.5%;
+  right: 12.5%;
+  height: 1px;
+  background: var(--light);
+  z-index: 0;
+}
+.step { text-align: center; padding: 0 12px; position: relative; z-index: 1; }
+.step-num {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+}
+.step:nth-child(2) .step-num { background: var(--steel); }
+.step:nth-child(3) .step-num { background: var(--steel); }
+.step:nth-child(4) .step-num { background: var(--green); }
+.step-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 6px;
+}
+.step-desc {
+  font-size: 0.74rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* ── CTA ── */
+.cta-card {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+  border-radius: 8px;
+  padding: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  animation: fadeUp 0.5s ease 0.3s both;
+}
+.cta-left h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: white;
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+.cta-left p {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.55);
+  font-weight: 300;
+  max-width: 380px;
+  line-height: 1.6;
+}
+.cta-right { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+.cta-btn {
+  background: white;
+  color: var(--navy);
+  border: none;
+  padding: 15px 32px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: transform 0.15s, box-shadow 0.15s;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+.cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+.cta-insurance {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.4);
+  text-align: right;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cta-insurance::before { content: '🛡️'; font-size: 0.85rem; }
+
+/* ── FOOTER ── */
+.footnote {
+  font-size: 0.73rem;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.7;
+  padding: 0 16px 40px;
+  margin-top: 8px;
+}
+
+@media(max-width: 640px) {
+  .header { padding: 0 20px; }
+  .hero { padding: 48px 24px 64px; }
+  .card, .results-card, .how-card, .cta-card { padding: 28px 24px; }
+  .row-2, .row-3 { grid-template-columns: 1fr; }
+  .key-metrics { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr 1fr; gap: 24px; }
+  .steps::before { display: none; }
+  .br-cols, .br-total-cols { gap: 16px; }
+  .cta-right { align-items: flex-start; }
+  .cta-insurance { text-align: left; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo-area">
+    <img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCADeAQkDASIAAhEBAxEB/8QAHAABAAIDAQEBAAAAAAAAAAAAAAcIAQUGAgQD/8QARxAAAQMEAAQDBAcEBgcJAAAAAQACAwQFBhEHEiExE0FRCCJhcRQVIzJCgZFSobHRFiQlN2KzFxgnNUOCwURVVmV1kpTS4f/EABoBAQADAQEBAAAAAAAAAAAAAAACAwQFAQb/xAAsEQEAAgEDAwMDAwUBAAAAAAAAAQIDBBESITFBE1FhInHBBUKxIzKB0fCh/9oADAMBAAIRAxEAPwC5aIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAi8TyxwQSTzPbHFG0ve5x0GgDZJVcGZrmfGPPKjHcTu8uO49TgvlqIdtnfGDrmLgQ7Z8mgjv13pXYsM5N57RHeVWXNGPaO8z2hZJFEEnAOxeCXxZXlbK3l6VJrgTzepHL6/H81r+FNTnWLcVp8Eyy+1F3t8tE+egnmPOZNEaPMdu3oOBaSdfvUvRraJmlt9kfVtExFq7bpvREWdeIiICIiAiIgIiICIiAiIgIiICIiAi+O93Shstpqbrc6hlPSU0ZklkcegA/ifh5qoGccfM4ueQVE1gur7TbA4tp4GQxudy+TnOc0nmPz0tGn0188zxZ8+ppgiOS5aKjH+mrih/wCLan/48P8A9FLHs0ZrxLy7MJvra6SXCxU8DvpTpYI2hryPcDXNaDzb8t61v4K7L+n5MdZtMx0U4tfjyXisRPVY9ERYW4REQEREBERBzfFGKpn4bZJDRtc6ofa6hsYb3LvDdrSqT7O+eUOCZnJPdg/6urofAnkaNmI7Ba/XmB5+ej+Su0QCCCNg9wq5cWvZ4fWV1ReMJmhjMrjI+3SnlaHHqfDd2A/wnp8Vv0eXHFbY8naWDWYsk2rkx94T/Y7zar5QsrrRcKaup3jYfDIHD5H0PwK81lmttXeqG8T04dXULZG08ocQWB404dOhBHqqKVVDnnDq7B8sV2sVSCQ2Rpc1r9ejh7rh+qnHgbx4rbteKXGsx8J81S4R01cxobzPPZrwOnXtsa/6r3LobUjnjneHmLXVvbhkjaVilGee8Zcdxy7fUVtpqnIL4XeGKOiG+V/7LndevwAJHnpZ9o/MqrD+Hcstue6Ovr5RSQSN7x7BLnd+hDQdH1IUbexrjVPUvu+X1cbZaiOQUlM53VzCRzSO+ZBaN/P1VWLBX0py37e3uty57erGKnfzPs7a68S+ItooX3O5cKahlAwczzHcGvexvqQ1pI/RdJwy4p4vnodBbppKW4Rjb6Ko0JNeZbro4fLr6gLunAOBBAIPQgqlXGi2zcO+NE9XYXmibzsrqTwzrk5upbrtrmDhrtrop4MePUb022nwjnyZNPtffePK3uYZJbcVssl2uv0j6Mw6PgQOldv5Dt27nQUY45x9tWTZtb8esljqTFVSESVVVM2Pw2gFzjyje9AE9wpOxW7R5Hh9uvPhhra6jZM5h6gFzeo/Xapjw5sVPfeNMNhknmpaWorKmKQwHld4Ya8uYD5AtBb8immw471vzjrDzU5slLU4T0lNOY+0parZfZaGx2Q3WlhdyuqnVPhtkI78g5Tseh8/RdRf+LtXQYVbsxoMLr6+zVVOJJZjUtjNO/nLeVzeUkjY6O7HYW8ruEfDurs4tjsXoYow3lbLE3lmb8efuT89rpquw2yoxiTG/orGW19KaQQtGg2Pl5QB8goWvp9o41+6ytM+88rfZDmKe0FV5TeI7RY8BqquskBcGC4taNDqSSWAAKb6qWeOglnhpjNO2IuZBzhvO7Ww3Z6DZ6bVHsWqavhdxlh+mDX1bXOgqfd+9Efdc4D4tOx+SvIJ4jTCoD2mIs5+bfTWt7U9bhpjtXhHSUNFmvkrPOesIYn433yHMG4lJw2rReXODW0wuLCTsb3sM1rXXe9dCtxmfG3H8SEdJd7VdG3UxtdLSsi9yN5aCWeIdB2t623YXPcCaV2XcTMp4mVLC6nM7qO2lw/CNAuHp7gaOn7Tl79syCF/Di2zujaZWXVjWvI6gGOTY/cP0UvTxTmrjmv36+UZyZYw2ycvt08Nri/HbHq/CKzKL1TG1tjrnUlPRsl8aactjY/3Roft69B69Vx9d7TUlPWa/oVNHTE+6Zqote4ev3NfxX6+x1jdkq8VuN/q7dBUXGK5Op4ppG83IwRRu90HoDtx6jr2Up8ZrDarzw1vkddRwyGnopZ4Xlo5o5GMLmkHuOo/TaWjBjzTSa7/AOSs58mKLxbbp7Po4ZZ7Y8+srrhaHvjkiIbUU0uvEhd5b13B8j5/qusVTPYyqZ2cQrnSNlcIZba572eRc2Rgafy5j+qtmqNVhjDlmsdl2lzTmxRae4hIAJJ0B3RQD7UfFL6ppJMJsM4+nVDP7QmY7rDGf+GP8Th39B8+leHFbLeK1WZstcVJtZwHtMcUjlN1djVkn/sWik+0kY7pVSj8W/No669e/pqE1k77nuvdNBLUzxwQRuklkcGsa0bJJ8l9JixVxUitXzWXLbLebWbnBcXueYZNS2K0xF887vefr3YmD7z3egH8h3KvZw/xO14XjFNYrVHqOIblkI96aQ/ee4+p/cNDsFFvAmkxvh/jf27J5rzWAOrJhGNN9I29fuj952fQCXsfv1Be2SuonSbiI52vbojfb+C5OvyZLztt9MOvoKY6R3+qW0REXMdMREQEREBERBos/wAiGJ4hcMhdSGrbRMa90QfylwL2tPXR7b3+S21trKe4W+nr6SQS09TE2WJ47Oa4bB/QrS8S7RU37h/fbPRxiSqq6GWOBhcGgycvu9T0HXSgThfxFyXhbRtxjiBjd2ZbInEU1QIduhG+rQT7r2b67Dunx6a0Y8PqY5mvePHwz5M3p3iLdp8/KyN4tlvu9vlt9zo4KyllHK+KVgc0/kVR7ibjUOI8W6qx2h7zDDUxvpgTtzQ7Tg3fnrelY24+0LhH0VwscV0vNeRqKlhpXNJd5Ak+Xy38lynCzhnkeT8QJOI2e0houaf6TT0Ug097x9zbT1a1uhoHqddtLVpZtp4tbJ0jbt7yy6qK6ia1x9Z37+0Pt9s6mnkwiyVOiWRV3K/p5mN2v4H9V+vsXVcEmB3eibI0zQ3LxHN31DXxtDT+ZY79FLudYzb8vxatx+5BwgqmaD2/ejcDtrh8QQCqyYvFmPATNp6m7Weor7DUjwqiemaXRys3tr2ns146+67Xcjt1XmK0ZdPOKP7o7fL3LWcWojLPaek/C2yp57XlXDVcVmwQuDn01DFFIB5OJc7Xz04KZq72hMB+rfEtElwulxe37KgipHh5d5AuI5dfEE/muD4dcKMjzfOJs64hUjqOmmqPpAopW6knIPutLT1YwAAe91IHx2mlrOC05MnT8vdXb16xjx9d/wDxNnCShmtvC2wUlQx7JW29jntcNFpcObRHl3VXOCAH+sfR6P8A26r6f8kitjnGU2rELKK+5tqnRvd4UUdNTulc53KSBodugPU6Cp3w7uVVjnFijy24WS6fQmVcskgbTO5mtkDhvqOuubevPSlpIm1ck+8I6vatsce0rxotPiOS2jKrUbnZpppadshicZad8Lg8AEjTwD2cOo6LcLmzExO0ujExMbwq97Y+JCmu9vzCmj1HWAUtXrt4jRtjvmWgj/lC+yw8SnVHs1T26OTmvcTm2WKMNDnPEnRhAHb7PmAJ82Hv5zdxUxiPL8DuliIHizQl1OSdcsrerDv5jXyJVX/ZixSqvPEouropG0VmcKmoieDrx2ktjBHk4EuPUfhK6mG9cmn+v9jmZaWx6j6P3rR8MsaixHBrXYowOeCEGZw/FK73nn9Sfy0o29sr+7Ch9PraP/KlU2quntYZPTXu1Q4faaC5VddR17Zql7KV/hxhrHDXNr3iecdtjoeqy6Xe+eLS06uIrgmsezc+xf8A3aXXt/vmT/IhUo8S/wC7vI//AEup/wAtyhP2TMmoLFaKnErtBX0txrbk6am5qSQseDExui4D3T9mT10OvdSVxyzC22HE7hZ5oK2puFzoJYqaGnpnPB5mluy4DQAJ9d/BSz0tOpnaPLzBesaePiEE+xqP9plef/KpP8yNW5VMPZ4vrMEzuS4ZBbbnFSz0j6fxGUjnGMlzXAka2R7uum/krlUk8VVSxVMJJilYHsJaQSCNjoeoUv1GJ9Xfwh+nTHo7eWvzCW7w4rdJbBC2a6spZDSMOvek5Ty9+ndUlreG3E2trJq2sxW9z1E8hklkfA4ue4nZJPmSVe9cxnuQi0URpaZ39dnb7pH/AA2/tfP0/wDxR0ee+OeNI3mUtZgpkryvMxEKPz4VlkMz4pbBXsewlrmmIggqReFeFSWgm7XaINrXAthiPXwh5k/E/uHzUiEk7c47JPUnzWG9ToLtTeZhw+Mb9H60lPPV1MdNTsMksjg1rQO5Ux4rZIbHbRA3Tp3+9NJ+07+QWo4e459W031jWM/rczfdaR1jb/MrrlxtZqOc8K9na0Wm4Rzt3kREWFvEREBERAREQFgta7uAfmFlEHhkUTCSyNjd+jQF7REBCARogH5oiD8YaWlhe58VNDG533i1gBPzX7IiAQD3G1jlb+yP0WUQAAOw0iLX5LS1tdjtxo7bVGkrZ6aSOnnBI8KQtIa7Y6jR0V7HWXktFxUze24LitRdKuRjqpzC2jpuYB00nloeg7k+QWg9nTHKiz4L9b3ME3a+zOr6p7wOYh33BseWve15FxXH4nwGulRk8V94hZIb4YHBzIOd7/E12D3P/D/hAU9tAa0NaAABoALRkmlKcKTvv3n8M+OL3vzvG23aPyysaHoFlFmaWOVvoP0WSAe4BREGOVv7I/RZREGuyO7RWa0y10rS8j3Y2D8Tj2Chi4VdRX18lXVP55ZXczj/ANFONdSU1dTOpquFs0Tu7XBar+iWPf8AdzP/AHO/mtul1GPDE7x1YtVp8maY2noh0nou14c439Jkbdq2P7GM/YsI++79r5BdaMTx8EH6tj6erj/NbqKOOKJsUTGsY0aa1o0AFZn1sWrxoqwaGaX5XekRFznSEREBERAREQEREBERAREQFCVbWZ3kfGTKcctGcOsVDa46eSJn0SOUHnjYSOo33JPfzU2qCIcCseX8fs2/pPaJ6qlihpX0zvEliaXeEwHRYRvstGn4xymfb238wz6jlPGI9/fbxKWcLt97tdidT33IPr2r8RzhVeA2L3dDTdN6dOvX4rl+AWRXjJMQuFbeq11XURXSeBjy1rdMby6HQDttddi+OWfFbCLPYqU0tFGXubGZHP0XHZ6uJPf4rgfZlpqimwS5x1NPNC83ipcGyMLSR7vUA+SdJpafmPy96xesfE/hzPCTixeJc7uFgy6odJQ1lfNT2ysfGGNbIx2vB2AAdgt15716rusByC73Litndmrax0tBbJKUUcRa0CIPi5ndQNnZ9drhuHmDRZbw6yuz3GGWkqTkNTPRTvYWuikGuV435eXxBK+r2bqfJIszzaXKqeWO5E0sUr3MIbKY2OZzA/i2Gg789rRlrjmLzXvH+46wz4rZImkW8/6npL4+O1VxJwa3PyKkz58tJV3MwwUQoYm+Ax4ke1vOQd8oaG/HupUwGyZVZzWHJctdkAmDPABpGQ+Drm5vu997Hy5fiuE9rqkqq3hrQRUlNNUPF3icWxMLiB4UvXQ/JTG37o+SoyX3xV7dd/EfC6lf6tu/jzKCMan4gZbd8llh4lCy09BeJ6SGndRxP9xrunU6PY6/JSnBWVOKcP5bjkN3N5lt9NJPPVtiawzAbcNNHTetD4qArDHw9pMiyxud4rca6skvlS+nkbRzPHhc3TRaQO+1NIobPmnCCe0WCnlorfU0T6WjjqI3RmLk21uweugQPyVuesRMRMdOniP5V4JnaevXr5n+HH45S8Ws5s4ymPL4cahqwZKC3x0jZQI/wl7j16/n066HZSNgs2VvxUHMaakgu8bnscaZ/M2Ro+6/XkT31/DehGOFcVKfC8YpsUzOxXmivFqjFMyOKlMjalrejCxw6Hprr2+Kk7CL3dMixNt1u1gqLHPNz8lLM/mfyfhcegI2PIgFV54tG+8Rtv0/7yngms7bTO+3X/vDm+AmVVl/4cUtyyG6Rz1755mvfIWMJDZHAdBodgF74JZDdsgjyl11rTViivs9LTEtaOSJobpo0Bvv3K4TgVwowy/cPKa5ZNjBluUlRMJHSyzRuIEjg3oHAdgPJdL7Ndr+p7fltBHRyUlPFkE7adj2uH2YawN0T1I0O6nmrjjnx9/z4Qw2yTw5e348paREWJtEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERARCQASSAB1JK+GgvFouEzoKC6UNXK0bcyGoa9wHqQCg+5ERAREQEREBERARF+fgs+k/SNyc/Jya8R3Lre/u71v462g/RE112iAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgLAa1pJDQCe5A7rKICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiD//2Q==" alt="Soryn Fintech" class="logo-img">
+    <span class="header-tag">Payments Calculator</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">International Payments Intelligence</div>
+    <h1>Your bank is holding your<br><em>working capital hostage</em></h1>
+    <p class="hero-sub">3–5 day SWIFT settlement isn't just slow — it's a balance sheet problem. See how much capital you're losing to transit delays, hidden FX spreads, and correspondent bank fees every year.</p>
+    <div class="trust-row">
+      <div class="trust-badge"><svg class="verified" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 2L13.09 7.26L18.72 6.27L15.91 11L18.72 15.73L13.09 14.74L11 20L8.91 14.74L3.28 15.73L6.09 11L3.28 6.27L8.91 7.26L11 2Z" fill="#1d9bf0"/><path d="M7.5 11.5L10 14L15 9" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Same-day settlement</div>
+      <div class="trust-badge"><svg class="verified" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 2L13.09 7.26L18.72 6.27L15.91 11L18.72 15.73L13.09 14.74L11 20L8.91 14.74L3.28 15.73L6.09 11L3.28 6.27L8.91 7.26L11 2Z" fill="#1d9bf0"/><path d="M7.5 11.5L10 14L15 9" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> No correspondent bank fees</div>
+      <div class="trust-badge"><svg class="verified" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 2L13.09 7.26L18.72 6.27L15.91 11L18.72 15.73L13.09 14.74L11 20L8.91 14.74L3.28 15.73L6.09 11L3.28 6.27L8.91 7.26L11 2Z" fill="#1d9bf0"/><path d="M7.5 11.5L10 14L15 9" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Fiat · Crypto · Fiat</div>
+      <div class="trust-badge"><svg class="verified" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 2L13.09 7.26L18.72 6.27L15.91 11L18.72 15.73L13.09 14.74L11 20L8.91 14.74L3.28 15.73L6.09 11L3.28 6.27L8.91 7.26L11 2Z" fill="#1d9bf0"/><path d="M7.5 11.5L10 14L15 9" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Up to £30M insured fund protection</div>
+      <div class="trust-badge"><svg class="verified" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 2L13.09 7.26L18.72 6.27L15.91 11L18.72 15.73L13.09 14.74L11 20L8.91 14.74L3.28 15.73L6.09 11L3.28 6.27L8.91 7.26L11 2Z" fill="#1d9bf0"/><path d="M7.5 11.5L10 14L15 9" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> FCA regulated</div>
+      <div class="trust-badge"><svg class="verified" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 2L13.09 7.26L18.72 6.27L15.91 11L18.72 15.73L13.09 14.74L11 20L8.91 14.74L3.28 15.73L6.09 11L3.28 6.27L8.91 7.26L11 2Z" fill="#1d9bf0"/><path d="M7.5 11.5L10 14L15 9" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Mid-market FX rate</div>
+      <div class="trust-badge yield-badge"><svg class="verified" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11 2L13.09 7.26L18.72 6.27L15.91 11L18.72 15.73L13.09 14.74L11 20L8.91 14.74L3.28 15.73L6.09 11L3.28 6.27L8.91 7.26L11 2Z" fill="#4eca7e"/><path d="M7.5 11.5L10 14L15 9" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> 10% APY on idle funds</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- INPUT CARD -->
+  <div class="card">
+    <div class="section-label">Your payment profile</div>
+
+    <div class="row-2">
+      <div class="field">
+        <label>Monthly payment volume</label>
+        <div class="input-wrap">
+          <span class="input-prefix">£</span>
+          <input type="number" id="volume" value="500000" min="1000" step="10000">
+        </div>
+      </div>
+      <div class="field">
+        <label>Transactions per month</label>
+        <div class="input-wrap">
+          <span class="input-prefix">#</span>
+          <input type="number" id="txCount" value="50" min="1">
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Currency corridor</label>
+      <select id="corridor">
+        <option value="gbp-eur">GBP → EUR</option>
+        <option value="gbp-usd">GBP → USD</option>
+        <option value="gbp-inr">GBP → INR</option>
+        <option value="gbp-cny">GBP → CNY</option>
+        <option value="gbp-aed">GBP → AED</option>
+        <option value="gbp-sgd">GBP → SGD</option>
+        <option value="gbp-hkd">GBP → HKD</option>
+        <option value="gbp-other">GBP → Other</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Your bank's FX spread above mid-market rate</label>
+      <div class="slider-wrap">
+        <input type="range" id="fxSpread" min="0.5" max="4" step="0.1" value="1.8">
+        <span class="slider-val" id="fxSpreadVal">1.8%</span>
+      </div>
+      <div class="field-hint">Typical bank spread: 1.5–3%. Compare your bank's rate at xe.com to check.</div>
+    </div>
+
+    <div class="row-2">
+      <div class="field">
+        <label>Bank flat fee per SWIFT wire</label>
+        <div class="input-wrap">
+          <span class="input-prefix">£</span>
+          <input type="number" id="flatFee" value="25" min="0">
+        </div>
+      </div>
+      <div class="field">
+        <label>Correspondent bank fee (avg.)</label>
+        <div class="input-wrap">
+          <span class="input-prefix">£</span>
+          <input type="number" id="corrFee" value="15" min="0">
+        </div>
+      </div>
+    </div>
+
+    <div class="row-2">
+      <div class="field">
+        <label>Current SWIFT settlement (days)</label>
+        <div class="slider-wrap">
+          <input type="range" id="settleDays" min="1" max="5" step="1" value="3">
+          <span class="slider-val" id="settleDaysVal">3 days</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Your cost of capital / borrowing rate</label>
+        <div class="slider-wrap">
+          <input type="range" id="costCapital" min="3" max="20" step="0.5" value="8">
+          <span class="slider-val" id="costCapitalVal">8%</span>
+        </div>
+        <div class="field-hint">Use your overdraft, credit facility, or opportunity cost rate.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS CARD -->
+  <div class="results-card">
+    <div class="results-label">Your annual cost analysis — SWIFT vs Soryn</div>
+
+    <!-- KEY METRICS -->
+    <div class="key-metrics">
+      <div class="key-metric">
+        <div class="km-label">Annual cost with your bank</div>
+        <div class="km-val red" id="bankCost">—</div>
+        <div class="km-sub">inc. FX, fees & float</div>
+      </div>
+      <div class="key-metric">
+        <div class="km-label">Annual cost with Soryn</div>
+        <div class="km-val green" id="ourCost">—</div>
+        <div class="km-sub">same-day, no correspondent fees</div>
+      </div>
+      <div class="key-metric hero-metric">
+        <div class="km-label">Your annual saving</div>
+        <div class="km-val green" id="annualSaving">—</div>
+        <div class="km-sub" id="savingPct">—</div>
+      </div>
+    </div>
+
+    <!-- WORKING CAPITAL HIGHLIGHT -->
+    <div class="wc-highlight">
+      <div class="wc-icon">⏱️</div>
+      <div class="wc-text">
+        <div class="wc-title">Working Capital Locked in Transit</div>
+        <div class="wc-body">At your current volume, your bank is holding <strong id="capitalLocked">—</strong> of your money in transit at any given moment. With Soryn's same-day settlement, that capital is back in your business — not sitting in the SWIFT network.</div>
+      </div>
+    </div>
+
+    <!-- BREAKDOWN -->
+    <div class="breakdown">
+      <div class="breakdown-title">Annual cost breakdown</div>
+      <div class="br-table">
+        <!-- Header -->
+        <div class="br-th"></div>
+        <div class="br-th">Bank</div>
+        <div class="br-th">Soryn</div>
+        <!-- Rows -->
+        <div class="br-label">FX spread cost</div>
+        <div class="br-val bank" id="bFx">—</div>
+        <div class="br-val soryn" id="sFx">—</div>
+
+        <div class="br-label">Wire / transaction fees</div>
+        <div class="br-val bank" id="bFlat">—</div>
+        <div class="br-val soryn" id="sFlat">—</div>
+
+        <div class="br-label">Correspondent bank fees</div>
+        <div class="br-val bank" id="bCorr">—</div>
+        <div class="br-val soryn" id="sCorr">—</div>
+
+        <div class="br-label">Working capital float cost</div>
+        <div class="br-val bank" id="bLiq">—</div>
+        <div class="br-val soryn" id="sLiq">—</div>
+
+        <!-- Divider -->
+        <div class="br-divider"></div>
+
+        <!-- Total -->
+        <div class="br-total-label">Total annual cost</div>
+        <div class="br-total-val bank" id="bTotal">—</div>
+        <div class="br-total-val soryn" id="sTotal">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="how-card">
+    <div class="section-label">How Soryn settles same-day</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-title">You send GBP</div>
+        <div class="step-desc">Funds leave your account in sterling via our secure platform</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-title">On-ramp to crypto</div>
+        <div class="step-desc">Converted at mid-market rate with our 0.35% spread — no hidden markup</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-title">Instant transfer</div>
+        <div class="step-desc">Settled across borders in minutes — no correspondent banks, no queues</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-title">Off-ramp to fiat</div>
+        <div class="step-desc">Recipient receives local currency same day. Funds insured up to £30M</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-card">
+    <div class="cta-left">
+      <h3>Ready to unlock your working capital?</h3>
+      <p>Most of our clients are experiencing six-figure savings annually. Book a 20-minute call and we'll run the numbers on your actual transaction data.</p>
+    </div>
+    <div class="cta-right">
+      <a href="#" class="cta-btn" id="ctaBtn">Book a call with Soryn →</a>
+      <div class="cta-insurance">Funds insured up to £30M per transaction</div>
+    </div>
+  </div>
+
+  <p class="footnote">
+    Estimates based on publicly available SWIFT fee structures and typical bank FX spreads. Soryn rates shown are illustrative — actual pricing subject to volume and corridor.<br>
+    This calculator is for indicative purposes only. Soryn Fintech · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4c3f2d20293f0c3f233e3522622f23623927">[email&#160;protected]</a>
+  </p>
+
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  const fmt     = n => '£' + Math.round(n).toLocaleString('en-GB');
+  const fmtPct  = n => n.toFixed(1) + '%';
+
+  // Soryn platform rates
+  const S_FX_SPREAD   = 0.35;  // %
+  const S_FLAT_FEE    = 3;     // £ per tx
+  const S_CORR_FEE    = 0;     // £
+  const S_SETTLE_DAYS = 0.04;  // ~1 hour (same day)
+  const DAYS_PER_YEAR = 250;
+
+  let currentSaving = 0;
+
+  function calc() {
+    const volume      = parseFloat(document.getElementById('volume').value)      || 0;
+    const txCount     = parseFloat(document.getElementById('txCount').value)     || 0;
+    const fxSpread    = parseFloat(document.getElementById('fxSpread').value)    || 0;
+    const flatFee     = parseFloat(document.getElementById('flatFee').value)     || 0;
+    const corrFee     = parseFloat(document.getElementById('corrFee').value)     || 0;
+    const settleDays  = parseFloat(document.getElementById('settleDays').value)  || 1;
+    const costCap     = parseFloat(document.getElementById('costCapital').value) || 8;
+
+    const annualVol = volume * 12;
+    const annualTx  = txCount * 12;
+    const capRate   = costCap / 100;
+
+    // Bank costs
+    const bFx   = annualVol * (fxSpread / 100);
+    const bFlat = annualTx  * flatFee;
+    const bCorr = annualTx  * corrFee;
+    const bLiq  = annualVol * (settleDays / DAYS_PER_YEAR) * capRate;
+    const bTotal = bFx + bFlat + bCorr + bLiq;
+
+    // Soryn costs
+    const sFx   = annualVol * (S_FX_SPREAD / 100);
+    const sFlat = annualTx  * S_FLAT_FEE;
+    const sCorr = 0;
+    const sLiq  = annualVol * (S_SETTLE_DAYS / DAYS_PER_YEAR) * capRate;
+    const sTotal = sFx + sFlat + sCorr + sLiq;
+
+    const saving    = Math.max(0, bTotal - sTotal);
+    const savingPct = bTotal > 0 ? (saving / bTotal) * 100 : 0;
+    currentSaving   = saving;
+
+    // Working capital locked at any one moment
+    const capitalLocked = volume * (settleDays / 21); // ~21 working days/month
+
+    // DOM updates
+    document.getElementById('annualSaving').textContent  = fmt(saving);
+    document.getElementById('bankCost').textContent      = fmt(bTotal);
+    document.getElementById('ourCost').textContent       = fmt(sTotal);
+    document.getElementById('savingPct').textContent     = fmtPct(savingPct) + ' reduction in costs';
+    document.getElementById('capitalLocked').textContent = fmt(capitalLocked);
+
+    document.getElementById('bFx').textContent    = fmt(bFx);
+    document.getElementById('sFx').textContent    = fmt(sFx);
+    document.getElementById('bFlat').textContent  = fmt(bFlat);
+    document.getElementById('sFlat').textContent  = fmt(sFlat);
+    document.getElementById('bCorr').textContent  = fmt(bCorr);
+    document.getElementById('sCorr').textContent  = fmt(sCorr);
+    document.getElementById('bLiq').textContent   = fmt(bLiq);
+    document.getElementById('sLiq').textContent   = fmt(sLiq);
+    document.getElementById('bTotal').textContent = fmt(bTotal);
+    document.getElementById('sTotal').textContent = fmt(sTotal);
+
+    // CTA mailto
+    const savingStr = '£' + Math.round(currentSaving).toLocaleString('en-GB');
+    const subject   = encodeURIComponent(`Yes, I'd like to save ${savingStr} a year`);
+    document.getElementById('ctaBtn').href = `mailto:sales@soryn.co.uk?subject=${subject}`;
+  }
+
+  // Sliders
+  document.getElementById('fxSpread').addEventListener('input', function() {
+    document.getElementById('fxSpreadVal').textContent = this.value + '%';
+    calc();
+  });
+  document.getElementById('settleDays').addEventListener('input', function() {
+    const d = parseInt(this.value);
+    document.getElementById('settleDaysVal').textContent = d + (d === 1 ? ' day' : ' days');
+    calc();
+  });
+  document.getElementById('costCapital').addEventListener('input', function() {
+    document.getElementById('costCapitalVal').textContent = this.value + '%';
+    calc();
+  });
+
+  // All other inputs
+  ['volume','txCount','flatFee','corrFee','corridor'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', calc);
+  });
+
+  calc();
+</script>
+</body>
+</html>
